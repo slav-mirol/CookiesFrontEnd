@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ElevatedButton(onPressed: (){
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) { return SearchPage(); }));
                 },
-                child: Text(
+                child: const Text(
                   "Go to search recipes!",
                   style: TextStyle(fontFamily: "assets/fonts/tenor_sans.ttf", fontSize: 30),
                 ),
@@ -48,9 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   primary: Colors.deepPurple[300],
                 )
               ),
-                Container(
-                    child: Image.network(image)
-                )
+                Image.network(image)
           ],
         ),
       ),

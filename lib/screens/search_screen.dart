@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:test1/screens/recipes_screen.dart';
 import 'package:test1/services/networkHelper.dart';
+import 'package:test1/recipe.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -9,9 +11,10 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   List<String> _result = [];
   List<String> data = [];
+  List<Recipe> recipes = [];
 
   Future<List<String>> getAllProduct() async {
-    String url = "http://localhost:8080/";
+    String url = "http://localhost:8080/products";
     List<String> all = [];
     NetworkHelper networkHelper = NetworkHelper(url: url);
     dynamic data = await networkHelper.getData();
@@ -19,9 +22,22 @@ class _SearchPageState extends State<SearchPage> {
     for (int i = 0; i < info.length; ++i) {
       all.add(info[i]["name"]);
     }
-    //print(all);
     return all;
   }
+
+  Future<List<Recipe>> getAllRecipes() async {
+    String url = "http://localhost:8080/recipes";
+    List<Recipe> all = [];
+    NetworkHelper networkHelper = NetworkHelper(url: url);
+    dynamic data = await networkHelper.getData();
+    List<dynamic> info = data as List;
+    for (int i = 0; i < info.length; ++i) {
+      Recipe curRecipe = Recipe(name: info[i]["name"], description: info[i]["description"], photo: info[i]["photo"], video: info[i]["video"]);
+      all.add(curRecipe);
+    }
+    return all;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +49,9 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           children: <Widget>[
             Text(_result == [] ? "Пока не выбрано ни одного продукта" : _result.toString(), style: const TextStyle(fontSize: 18)),
+            Container(
+              height: 20,
+            ),
             ElevatedButton(
               onPressed: () async {
                 data = await getAllProduct();
@@ -40,14 +59,33 @@ class _SearchPageState extends State<SearchPage> {
                   context: context,
                   delegate: CustomDelegate(data: data),
                 );
-                setState(() {
-                  _result.add(result!);
-                });
+                if  (result != null) {
+                  setState(() {
+                    _result.add(result);
+                  });
+                }
               },
               child: const Text("Search"),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.deepPurple[300],
                 )
+            ),
+            Container(
+              height: 20,
+            ),
+            ElevatedButton(
+                onPressed: () async {
+                  recipes = await getAllRecipes();
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) { return RecipesScreen(recipes); }));
+                  //setState((){});
+                },
+                child: const Text("Print Recipes..."),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.deepPurple[300],
+                )
+            ),
+            Container(
+              height: 20,
             ),
           ],
         ),
