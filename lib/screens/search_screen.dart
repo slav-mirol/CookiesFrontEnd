@@ -25,14 +25,22 @@ class _SearchPageState extends State<SearchPage> {
     return all;
   }
 
-  Future<List<Recipe>> getAllRecipes() async {
-    String url = "http://localhost:8080/recipes";
+  Future<List<Recipe>> getRecipes(List<String> products) async {
+    String url = "http://localhost:8080/recipes/search";
+    url += "?product=" + products[0];
+    for (int i = 1; i< products.length; ++i) {
+      url += "&product=" + products[i];
+    }
     List<Recipe> all = [];
     NetworkHelper networkHelper = NetworkHelper(url: url);
     dynamic data = await networkHelper.getData();
     List<dynamic> info = data as List;
     for (int i = 0; i < info.length; ++i) {
-      Recipe curRecipe = Recipe(name: info[i]["name"], description: info[i]["description"], photo: info[i]["photo"], video: info[i]["video"]);
+      Recipe curRecipe = Recipe(
+          name: info[i]["name"],
+          description: info[i]["description"],
+          photo: info[i]["photo"],
+          video: info[i]["video"]);
       all.add(curRecipe);
     }
     return all;
@@ -42,48 +50,69 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Search"),
-          backgroundColor: Colors.deepPurple[300],
+        title: const Text("Search"),
+        backgroundColor: Colors.deepPurple[300],
       ),
       body: Center(
         child: Column(
           children: <Widget>[
-            Text(_result == [] ? "Пока не выбрано ни одного продукта" : _result.toString(), style: const TextStyle(fontSize: 18)),
-            Container(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                data = await getAllProduct();
-                var result = await showSearch<String>(
-                  context: context,
-                  delegate: CustomDelegate(data: data),
-                );
-                if  (result != null) {
-                  setState(() {
-                    _result.add(result);
-                  });
-                }
-              },
-              child: const Text("Search"),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.deepPurple[300],
-                )
+            SizedBox(
+              height: 40,
+              width: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _result.length,
+                itemBuilder: (_, i) {
+                  return Row(
+                    children: [
+                      Container(width: 10),
+                      Text(_result[i], style: const TextStyle(fontFamily: "assets/fonts/tenor_sans.ttf", fontSize: 15)),
+                      Container(width: 10),
+                      IconButton(onPressed: () {
+                        _result.removeAt(i);
+                        setState((){});
+                      }, icon: const Icon(Icons.clear, size: 20))
+                    ],
+                  );
+                },
+              ),
             ),
             Container(
               height: 20,
             ),
             ElevatedButton(
                 onPressed: () async {
-                  recipes = await getAllRecipes();
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) { return RecipesScreen(recipes); }));
+                  data = await getAllProduct();
+                  var result = await showSearch<String>(
+                    context: context,
+                    delegate: CustomDelegate(data: data),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      _result.add(result);
+                    });
+                  }
+                },
+                child: const Text("Search"),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.deepPurple[300],
+                )),
+            Container(
+              height: 20,
+            ),
+            ElevatedButton(
+                onPressed: () async {
+                  recipes = await getRecipes(_result);
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    return RecipesScreen(recipes);
+                  }));
                   //setState((){});
                 },
                 child: const Text("Print Recipes..."),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.deepPurple[300],
-                )
-            ),
+                )),
             Container(
               height: 20,
             ),
@@ -101,10 +130,13 @@ class CustomDelegate<T> extends SearchDelegate<T> {
   CustomDelegate({required this.data});
 
   @override
-  List<Widget> buildActions(BuildContext context) => [IconButton(icon: const Icon(Icons.clear), onPressed: () => query = '')];
+  List<Widget> buildActions(BuildContext context) =>
+      [IconButton(icon: const Icon(Icons.clear), onPressed: () => query = '')];
 
   @override
-  Widget buildLeading(BuildContext context) => IconButton(icon: const Icon(Icons.chevron_left), onPressed: () => close(context, exit));
+  Widget buildLeading(BuildContext context) => IconButton(
+      icon: const Icon(Icons.chevron_left),
+      onPressed: () => close(context, exit));
 
   @override
   Widget buildResults(BuildContext context) => Container();
@@ -113,7 +145,8 @@ class CustomDelegate<T> extends SearchDelegate<T> {
   Widget buildSuggestions(BuildContext context) {
     var listToShow;
     if (query.isNotEmpty) {
-      listToShow = data.where((e) => e.contains(query) && e.startsWith(query)).toList();
+      listToShow =
+          data.where((e) => e.contains(query) && e.startsWith(query)).toList();
     } else {
       listToShow = data;
     }
