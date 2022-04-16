@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test1/screens/find_product.dart';
-import 'search_screen.dart';
+import 'search/search_screen.dart';
 
 class MyHomePage extends StatefulWidget {
 

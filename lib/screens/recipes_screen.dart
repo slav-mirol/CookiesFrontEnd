@@ -65,6 +65,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                       ),
                     ],
                   ));
-            }));
+            })
+    );
   }
 }
