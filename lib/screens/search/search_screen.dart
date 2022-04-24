@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test1/constants.dart';
+import 'components/MyBottomNavigate.dart';
 import 'components/body.dart';
 
 class SearchPage extends StatelessWidget {
@@ -8,6 +9,7 @@ class SearchPage extends StatelessWidget {
     return Scaffold(
       appBar: buildAppBar(),
       body: Body(),
+      bottomNavigationBar: MyBottomNavigate(),
     );
   }
 
