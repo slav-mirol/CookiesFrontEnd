@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test1/constants.dart';
+import 'package:test1/product.dart';
 
 import '../../../recipe.dart';
 import '../../../services/networkHelper.dart';
@@ -8,13 +9,15 @@ import 'CustomDelegate.dart';
 
 class Body extends StatefulWidget {
   @override
-  _BodyState createState() => _BodyState();
+  _BodyState createState() {
+    return _BodyState();
+  }
 }
 
 class _BodyState extends State<Body> {
-  List<String> _result = [];
+  List<String> products = [];
   List<String> data = [];
-  List<Recipe> recipes = [];
+  //List<Recipe> recipes = [];
   String search_text = "";
 
   Future<List<String>> getAllProduct() async {
@@ -29,7 +32,7 @@ class _BodyState extends State<Body> {
     return all;
   }
 
-  Future<List<Recipe>> getRecipes(List<String> products) async {
+  /*Future<List<Recipe>> getRecipes(List<String> products) async {
     String url = "http://localhost:8080/recipes/search";
     url += "?product=" + products[0];
     for (int i = 1; i < products.length; ++i) {
@@ -46,6 +49,69 @@ class _BodyState extends State<Body> {
           photo: info[i]["photo"],
           video: info[i]["video"],
           date: info[i]["date"]);
+      all.add(curRecipe);
+    }
+    return all;
+  }*/
+
+  /*Future<List<Recipe>> getRecipesByName(String name) async {
+    String url = "http://localhost:8080/recipes/search/" + name;
+    List<Recipe> all = [];
+    NetworkHelper networkHelper = NetworkHelper(url: url);
+    dynamic data = await networkHelper.getData();
+    List<dynamic> info = data as List;
+    for (int i = 0; i < info.length; ++i) {
+      Recipe curRecipe = Recipe(
+          name: info[i]["name"],
+          description: info[i]["description"],
+          photo: info[i]["photo"],
+          video: info[i]["video"],
+          date: info[i]["date"]);
+      all.add(curRecipe);
+    }
+    return all;
+  }*/
+
+  Future<List<Recipe>> getRecipes(String name, List<String> products) async {
+    bool flag = false;
+    String url = "http://localhost:8080/recipes/search/filter?";
+    if (name != "") {
+      url += "recipeName=" + name;
+      flag = true;
+    }
+    if (flag && products.isNotEmpty) {
+      url += "&";
+    }
+    if (products.isNotEmpty) {
+      url += "product=";
+      for (int i = 0; i < products.length - 2; ++i) {
+        url += products[i] + ',';
+      }
+      url += products[products.length - 1];
+    }
+    List<Recipe> all = [];
+    NetworkHelper networkHelper = NetworkHelper(url: url);
+    dynamic data = await networkHelper.getData();
+    List<dynamic> info = data as List;
+    for (int i = 0; i < info.length; ++i) {
+      List<dynamic> curProducts = info[i]["products"] as List;
+      List<Product> _products = [];
+      for (int j = 0; j < curProducts.length; ++j) {
+        Product curProduct = Product(
+            name: curProducts[j]["name"],
+            photo: curProducts[j]["image"],
+        );
+        _products.add(curProduct);
+      }
+      Recipe curRecipe = Recipe(
+          name: info[i]["name"],
+          description: info[i]["description"],
+          photo: info[i]["photo"],
+          video: info[i]["video"],
+          date: info[i]["date"],
+          products: _products
+      );
+      print(curRecipe);
       all.add(curRecipe);
     }
     return all;
@@ -79,7 +145,7 @@ class _BodyState extends State<Body> {
                         style: Theme.of(context).textTheme.headline5?.copyWith(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       Image.asset("assets/images/logoTotalWhite2.png"),
                     ],
                   ),
@@ -109,12 +175,14 @@ class _BodyState extends State<Body> {
                       children: [
                         Expanded(
                           child: TextField(
-                            cursorColor: kPrimaryColor,
                             onChanged: (value) {
                               search_text = value;
+                              //recipes = await getRecipes(search_text, products);
+                              setState(() {});
                             },
+                            cursorColor: kPrimaryColor,
                             decoration: InputDecoration(
-                              hintText: "Введите продукт",
+                              hintText: "Введите название рецепта",
                               hintStyle: TextStyle(
                                   color: kPrimaryColor.withOpacity(0.5)),
                               enabledBorder: InputBorder.none,
@@ -125,14 +193,15 @@ class _BodyState extends State<Body> {
                         IconButton(
                             onPressed: () async {
                               data = await getAllProduct();
-                              var result = await showSearch<String>(
+                              String? result = await showSearch<String>(
                                 context: context,
-                                delegate: CustomDelegate(data, search_text),
+                                delegate: CustomDelegate(data),
                               );
-                              if (result != null) {
-                                setState(() {
-                                  _result.add(result);
-                                });
+                              if (result != null && !products.contains(result)) {
+                                products.add(result);
+                                //recipes =
+                                   // await getRecipes(search_text, products);
+                                setState(() {});
                               }
                             },
                             icon: const Icon(
@@ -153,7 +222,7 @@ class _BodyState extends State<Body> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: _result.length,
+            itemCount: products.length,
             itemBuilder: (_, i) {
               return Row(
                 children: [
@@ -165,14 +234,14 @@ class _BodyState extends State<Body> {
                     ),
                     child: Row(
                       children: [
-                        Text(_result[i],
+                        Text(products[i],
                             style: const TextStyle(
                                 fontFamily: "assets/fonts/tenor_sans.ttf",
                                 fontSize: 15,
                                 color: Colors.white)),
                         IconButton(
-                            onPressed: () {
-                              _result.removeAt(i);
+                            onPressed: () async {
+                              products.removeAt(i);
                               setState(() {});
                             },
                             icon: const Icon(Icons.clear, size: 20)),
@@ -187,75 +256,96 @@ class _BodyState extends State<Body> {
             },
           ),
         ),
-        ElevatedButton(
-            onPressed: () async {
-              recipes = await getRecipes(_result);
-              //Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              //  return RecipesScreen(recipes);
-              //}));
-              setState(() {});
-            },
-            child: const Text("Print Recipes..."),
-            style: ElevatedButton.styleFrom(
-              primary: kPrimaryColor,
-            )),
         Container(
             margin: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
             padding: const EdgeInsets.symmetric(vertical: kDefaultPadding),
-            height: size.height * 0.6 - 90,
-            child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: recipes.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(15)),
-                        border: Border.all(
-                            color: kPrimaryColor.withOpacity(0.5), width: 0.3),
-                      ),
-                      margin: const EdgeInsets.only(bottom: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(15),
-                                    topRight: Radius.circular(15)),
-                                color: kPrimaryColor,
+            height: size.height * 0.6 - 45,
+            child: FutureBuilder<List<Recipe>>(
+                future: getRecipes(search_text, products),
+                builder: (context, AsyncSnapshot<List<Recipe>> snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: snapshot.data?.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(15)),
+                                border: Border.all(
+                                    color: kPrimaryColor.withOpacity(0.5),
+                                    width: 0.3),
                               ),
-                              padding: const EdgeInsets.all(10),
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) { return RecipesScreen(recipes[index]); }));
-                                  },
-                                  child: Text(recipes[index].name,
-                                      textAlign: TextAlign.left,
-                                      style: const TextStyle(
-                                          fontFamily:
-                                              "assets/fonts/tenor_sans.ttf",
-                                          fontSize: 30)),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: kPrimaryColor,
-                                  ))
-                              ),
-                          Container(
-                            child: Text(
-                              recipes[index].description,
-                              style: const TextStyle(
-                                  fontFamily: "assets/fonts/tenor_sans.ttf",
-                                  fontSize: 18),
-                            ),
-                            padding: const EdgeInsets.all(10),
-                          ),
-                          Container(
-                            child: Image.network(recipes[index].photo, height: 1200,),
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ],
-                      ));
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        child: Image.network(
+                                            snapshot.data![index].photo,
+                                            fit: BoxFit.contain),
+                                        height: size.height * 0.6 - 110,
+                                        width: size.width * 0.3,
+                                        padding: const EdgeInsets.all(10),
+                                      ),
+                                      SizedBox(
+                                        height: size.height * 0.6 - 110,
+                                        width: size.width * 0.6,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(
+                                                  kDefaultPadding),
+                                              child: ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                            builder: (context) {
+                                                      return RecipesScreen(
+                                                          snapshot.data![index]);
+                                                    }));
+                                                  },
+                                                  child: Text(
+                                                      snapshot.data![index].name,
+                                                      textAlign: TextAlign.left,
+                                                      style: const TextStyle(
+                                                          fontFamily:
+                                                              "assets/fonts/tenor_sans.ttf",
+                                                          fontSize: 30,
+                                                          color:
+                                                              kPrimaryColor)),
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    primary: Colors.white,
+                                                  )),
+                                            ),
+                                            Container(
+                                              child: Text(
+                                                snapshot.data![index].description,
+                                                style: const TextStyle(
+                                                    fontFamily:
+                                                        "assets/fonts/tenor_sans.ttf",
+                                                    fontSize: 18),
+                                              ),
+                                              padding: const EdgeInsets.all(10),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row()
+                                ],
+                              ));
+                        });
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
                 })),
       ],
     );

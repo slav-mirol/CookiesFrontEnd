@@ -37,7 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
               Container(
                 height: 15
               ),
-              ElevatedButton(onPressed: (){
+              ElevatedButton(onPressed: () {
+
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) { return SearchPage(); }));
                 },
                 child: const Text(

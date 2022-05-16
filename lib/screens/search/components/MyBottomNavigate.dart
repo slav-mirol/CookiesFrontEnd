@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
+import '../../add_recipe/add_recipe_screen.dart';
+import '../search_screen.dart';
 
 class MyBottomNavigate extends StatelessWidget {
 
@@ -23,7 +25,9 @@ class MyBottomNavigate extends StatelessWidget {
         children: [
           IconButton(
             icon: const Icon(Icons.home),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) { return SearchPage(); }));
+            },
           ),
           IconButton(
             icon: const Icon(Icons.favorite),
@@ -31,7 +35,9 @@ class MyBottomNavigate extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) { return AddRecipe(); }));
+            },
           ),
           IconButton(
             icon: const Icon(Icons.account_circle),

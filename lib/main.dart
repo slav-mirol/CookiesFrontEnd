@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test1/constants.dart';
 import 'package:test1/screens/General_screen.dart';
+import 'package:test1/screens/search/components/body.dart';
 
 void main() {
   runApp(const MyApp());
