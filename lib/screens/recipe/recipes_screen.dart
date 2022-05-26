@@ -33,9 +33,9 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding, vertical: kDefaultPadding),
-                    width: size.width / 2,
-                    height: size.height * 0.8,
-                    child: Image.network(recipe.photo, fit: BoxFit.contain),
+                    width: size.width * 0.4,
+                    height: size.width * 0.25,
+                    child: Image.network(recipe.photo, fit: BoxFit.fill),
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -43,17 +43,22 @@ class _RecipesScreenState extends State<RecipesScreen> {
                       Container(
                           padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
                           width: size.width / 2,
-                          child: Text(recipe.name, style: const TextStyle(fontSize: 30, ),)
+                          child: Text(recipe.name, style: const TextStyle(fontFamily: "norm", fontSize: 80, color: Colors.deepPurple),)
                       ),
+                      Text(""),
+                      Text(""),
+                      Text(""),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
                         width: size.width / 2,
-                        child: Text(recipe.description, style: const TextStyle(fontSize: 20, ),)
+                        child: Text(recipe.description, style: const TextStyle(fontFamily: "norm", fontSize: 30),)
                       ),
+                      Text(""),
+                      Text(""),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
                         width: size.width / 2,
-                        child: Text(recipe.date, style: const TextStyle(fontSize: 20, ), textAlign: TextAlign.left,)
+                        child: Text(recipe.date, style: const TextStyle(fontFamily: "norm", fontSize: 30), textAlign: TextAlign.right,)
                       )
                     ],
                   ),
@@ -62,8 +67,8 @@ class _RecipesScreenState extends State<RecipesScreen> {
               const Padding(
                 padding: EdgeInsets.all(10.0),
                 child: Text(
-                  'Продукты',
-                  style: TextStyle(fontFamily: "assets/fonts/tenor_sans.ttf", fontSize: 30),
+                  'Ingredients',
+                  style: TextStyle(fontFamily: "norm", fontSize: 50, color: Colors.deepPurple),
                 ),
               ),
               Container(
@@ -88,22 +93,20 @@ class _RecipesScreenState extends State<RecipesScreen> {
                             ),*/
                             Container(
                               height: size.height * 0.25,
-                              child: Image.network(recipe.products[i].photo, fit: BoxFit.contain),
+                              width: size.height * 0.35,
+                              child: Image.network(recipe.products[i].photo, fit: BoxFit.fill),
                             ),
                             Container(
                               width: 10,
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              decoration: BoxDecoration(
-                                color: kPrimaryColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
                               child: Text(recipe.products[i].name,
                                   style: const TextStyle(
-                                      fontFamily: "assets/fonts/tenor_sans.ttf",
-                                      fontSize: 20,
-                                      color: Colors.white)),
+                                      fontFamily: "norm",
+                                      fontSize: 40,
+                                      color: Colors.black
+                                  )),
                             ),
                             Container(
                               width: 10,

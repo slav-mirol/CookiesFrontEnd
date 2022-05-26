@@ -144,13 +144,13 @@ class _BodyState extends State<Body> {
                       )),
                   child: Row(
                     children: [
+                      Image.asset("assets/images/logoTotalWhite2.png"),
+                      const Spacer(),
                       Text(
-                        "Hi, User!",
+                        "",
                         style: Theme.of(context).textTheme.headline5?.copyWith(
                             color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                      const Spacer(),
-                      Image.asset("assets/images/logoTotalWhite2.png"),
+                      )
                     ],
                   ),
                 ),
@@ -319,8 +319,8 @@ class _BodyState extends State<Body> {
                                                       textAlign: TextAlign.left,
                                                       style: const TextStyle(
                                                           fontFamily:
-                                                              "assets/fonts/tenor_sans.ttf",
-                                                          fontSize: 30,
+                                                              "assets/fonts/Comic_Sans_MS.ttf",
+                                                          fontSize: 50,
                                                           color:
                                                               kPrimaryColor)),
                                                   style:
@@ -334,7 +334,7 @@ class _BodyState extends State<Body> {
                                                 style: const TextStyle(
                                                     fontFamily:
                                                         "assets/fonts/tenor_sans.ttf",
-                                                    fontSize: 18),
+                                                    fontSize: 30),
                                               ),
                                               padding: const EdgeInsets.all(10),
                                             ),
