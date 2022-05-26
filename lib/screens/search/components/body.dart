@@ -16,18 +16,22 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   List<String> products = [];
-  List<String> data = [];
+  List<Product> data = [];
   //List<Recipe> recipes = [];
   String search_text = "";
 
-  Future<List<String>> getAllProduct() async {
+  Future<List<Product>> getAllProduct() async {
     String url = "http://localhost:8080/products";
-    List<String> all = [];
+    List<Product> all = [];
     NetworkHelper networkHelper = NetworkHelper(url: url);
     dynamic data = await networkHelper.getData();
     List<dynamic> info = data as List;
     for (int i = 0; i < info.length; ++i) {
-      all.add(info[i]["name"]);
+      Product curProduct = Product(
+        name: info[i]["name"],
+        photo: info[i]["image"],
+      );
+      all.add(curProduct);
     }
     return all;
   }
@@ -111,7 +115,7 @@ class _BodyState extends State<Body> {
           date: info[i]["date"],
           products: _products
       );
-      print(curRecipe);
+      //print(curRecipe);
       all.add(curRecipe);
     }
     return all;

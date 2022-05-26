@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../constants.dart';
+import '../../../product.dart';
 import '../../../services/networkHelper.dart';
 import '../../search/components/CustomDelegate.dart';
 
@@ -21,14 +22,18 @@ class _BodyState extends State<Body> {
   String url_video = '';
   List<String> products = [];
 
-  Future<List<String>> getAllProduct() async {
+  Future<List<Product>> getAllProduct() async {
     String url = "http://localhost:8080/products";
-    List<String> all = [];
+    List<Product> all = [];
     NetworkHelper networkHelper = NetworkHelper(url: url);
     dynamic data = await networkHelper.getData();
     List<dynamic> info = data as List;
     for (int i = 0; i < info.length; ++i) {
-      all.add(info[i]["name"]);
+      Product curProduct = Product(
+        name: info[i]["name"],
+        photo: info[i]["image"],
+      );
+      all.add(curProduct);
     }
     return all;
   }
@@ -211,7 +216,7 @@ class _BodyState extends State<Body> {
           ),
           ElevatedButton(
             onPressed: () async {
-              List<String> data = await getAllProduct();
+              List<Product> data = await getAllProduct();
               String? result = await showSearch<String>(
                 context: context,
                 delegate: CustomDelegate(data),
