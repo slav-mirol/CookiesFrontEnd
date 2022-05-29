@@ -44,7 +44,6 @@ class CustomDelegate<T> extends SearchDelegate<T> {
     Size size = MediaQuery.of(context).size;
     var listToShow;
     if (query.isNotEmpty) {
-      //listToShow = data.where((e) => e.contains(query)).toList();
       listToShow = http.get(Uri.parse(
           'http://localhost:8080/products/search?productName=' + query));
     } else {
@@ -60,11 +59,14 @@ class CustomDelegate<T> extends SearchDelegate<T> {
                 var noun = snapshot.data![i].name;
                 return ListTile(
                   title: Row(children: [
-                    Container(
-                      height: size.height * 0.07,
-                      width: size.width * 0.07,
-                      child: Image.network(snapshot.data![i].photo,
-                          fit: BoxFit.fill),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        height: size.height * 0.07,
+                        width: size.height * 0.07,
+                        child: Image.network(snapshot.data![i].photo,
+                            fit: BoxFit.fill),
+                      ),
                     ),
                     Text(snapshot.data![i].name)
                   ]),

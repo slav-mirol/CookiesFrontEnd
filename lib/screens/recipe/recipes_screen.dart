@@ -45,18 +45,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
                           width: size.width / 2,
                           child: Text(recipe.name, style: const TextStyle(fontFamily: "norm", fontSize: 80, color: Colors.deepPurple),)
                       ),
-                      Text(""),
-                      Text(""),
-                      Text(""),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                        padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding * 1.5),
                         width: size.width / 2,
                         child: Text(recipe.description, style: const TextStyle(fontFamily: "norm", fontSize: 30),)
                       ),
-                      Text(""),
-                      Text(""),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                        padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding * 2),
                         width: size.width / 2,
                         child: Text(recipe.date, style: const TextStyle(fontFamily: "norm", fontSize: 30), textAlign: TextAlign.right,)
                       )
@@ -122,10 +117,10 @@ class _RecipesScreenState extends State<RecipesScreen> {
                   },
                 ),
               ),
-              Container(
+              /*Container(
                 height: size.height * 0.8,
                 child: NetworkPlayerController(url: recipe.video),
-              ),
+              ),*/
             ],
           ),
         ),

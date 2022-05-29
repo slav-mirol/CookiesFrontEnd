@@ -197,15 +197,18 @@ class _BodyState extends State<Body> {
                         IconButton(
                             onPressed: () async {
                               data = await getAllProduct();
-                              String? result = await showSearch<String>(
+                              dynamic result = await showSearch<dynamic>(
                                 context: context,
                                 delegate: CustomDelegate(data),
                               );
-                              if (result != null && !products.contains(result)) {
-                                products.add(result);
-                                //recipes =
-                                   // await getRecipes(search_text, products);
-                                setState(() {});
+                              if (result != null) {
+                                String chooseProduct = result as String;
+                                if (!products.contains(chooseProduct)) {
+                                  products.add(chooseProduct);
+                                  //recipes =
+                                  // await getRecipes(search_text, products);
+                                  setState(() {});
+                                }
                               }
                             },
                             icon: const Icon(
@@ -238,7 +241,7 @@ class _BodyState extends State<Body> {
                     ),
                     child: Row(
                       children: [
-                        Text(products[i],
+                        Text(' ' + products[i],
                             style: const TextStyle(
                                 fontFamily: "assets/fonts/tenor_sans.ttf",
                                 fontSize: 15,
@@ -296,7 +299,7 @@ class _BodyState extends State<Body> {
                                         padding: const EdgeInsets.all(10),
                                       ),
                                       SizedBox(
-                                        height: size.height * 0.6 - 110,
+                                        //height: size.height * 0.8,
                                         width: size.width * 0.6,
                                         child: Column(
                                           mainAxisAlignment:
@@ -348,7 +351,7 @@ class _BodyState extends State<Body> {
                               ));
                         });
                   } else {
-                    return const CircularProgressIndicator();
+                    return Container(height: size.height * 0.1,);
                   }
                 })),
       ],

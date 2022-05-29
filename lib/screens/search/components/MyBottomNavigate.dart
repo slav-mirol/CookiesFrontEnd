@@ -23,26 +23,23 @@ class MyBottomNavigate extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Spacer(),
           IconButton(
             icon: const Icon(Icons.home),
             onPressed: () {
+              Navigator.of(context).pop(null);
               Navigator.of(context).push(MaterialPageRoute(builder: (context) { return SearchPage(); }));
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.favorite),
-            onPressed: () {},
-          ),
+          Spacer(),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
+              Navigator.of(context).pop(null);
               Navigator.of(context).push(MaterialPageRoute(builder: (context) { return AddRecipe(); }));
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.account_circle),
-            onPressed: () {},
-          ),
+          Spacer()
         ],
       ),
     );

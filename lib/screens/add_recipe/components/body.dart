@@ -21,6 +21,8 @@ class _BodyState extends State<Body> {
   String url_photo = '';
   String url_video = '';
   List<String> products = [];
+  bool is_added = false;
+  bool error = false;
 
   Future<List<Product>> getAllProduct() async {
     String url = "http://localhost:8080/products";
@@ -38,6 +40,78 @@ class _BodyState extends State<Body> {
     return all;
   }
 
+  Widget check() {
+    if (!is_added && !error) {
+      return ElevatedButton(
+          onPressed: () async {
+            String url = "http://localhost:8080/recipes/add";
+            String curTime = '';
+            for (int i = 0; i < 10; ++i) {
+              curTime += DateTime.now().toString()[i];
+            }
+            if (name != '' && description != '' && url_photo != '' && !products.isEmpty) {
+              var jsonMap = {
+                "name": name,
+                "description": description,
+                "video": url_video,
+                "photo": url_photo,
+                "date": curTime
+              };
+              String jsonStr = jsonEncode(jsonMap);
+              //print(jsonStr);
+              http.Response response = await http.post(Uri.parse(url),
+                  body: jsonStr, headers: {"Content-Type": "application/json"});
+              String id_recipe = jsonDecode(response.body)["id"].toString();
+              //print(id_recipe);
+              for (int i = 0; i < products.length; ++i) {
+                String url_id_product =
+                    "http://localhost:8080/products/id?productName=" +
+                        products[i];
+                response = await http.get(Uri.parse(url_id_product));
+                //print(response.body);
+                String id_product = response.body;
+                url = "http://localhost:8080/recipes/" +
+                    id_recipe +
+                    "/products/" +
+                    id_product;
+                response = await http.put(Uri.parse(url));
+                //print(response.statusCode);
+              }
+              is_added = true;
+            }
+            else {
+              error = true;
+            }
+            //print(is_added);
+            //print(error);
+            setState(() {});
+          },
+          child: const Text(
+            "Добавить рецепт",
+            style: TextStyle(
+                fontFamily: "assets/fonts/tenor_sans.ttf", fontSize: 30),
+          ),
+          style: ElevatedButton.styleFrom(
+            primary: Colors.deepPurple[300],
+          ));
+    } else if (error){
+      error = false;
+      return const Text('Ошибка: все поля обязательны к заполнению!',
+          style: TextStyle(
+              fontFamily: "assets/fonts/tenor_sans.ttf",
+              fontSize: 30,
+              color: Colors.red));
+    }
+    else {
+      is_added = false;
+      return const Text('Ваш рецепт успешно добавлен!',
+          style: TextStyle(
+              fontFamily: "assets/fonts/tenor_sans.ttf",
+              fontSize: 30,
+              color: Colors.green));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -51,7 +125,7 @@ class _BodyState extends State<Body> {
             child: Text("Название",
                 style: TextStyle(
                     fontFamily: "assets/fonts/tenor_sans.ttf",
-                    fontSize: 14,
+                    fontSize: 30,
                     color: kPrimaryColor)),
           ),
           Container(
@@ -70,19 +144,19 @@ class _BodyState extends State<Body> {
                     color: kPrimaryColor.withOpacity(0.7),
                   )
                 ]),
-            child: Expanded(
-              child: TextField(
-                onChanged: (value) {
-                  name = value;
-                  setState(() {});
-                },
-                cursorColor: kPrimaryColor,
-                decoration: InputDecoration(
-                  hintText: "Введите название рецепта",
-                  hintStyle: TextStyle(color: kPrimaryColor.withOpacity(0.5)),
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                ),
+            child: TextField(
+              onChanged: (value) {
+                name = value;
+                is_added = false;
+                error = false;
+                setState(() {});
+              },
+              cursorColor: kPrimaryColor,
+              decoration: InputDecoration(
+                hintText: "Введите название рецепта",
+                hintStyle: TextStyle(color: kPrimaryColor.withOpacity(0.5)),
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
               ),
             ),
           ),
@@ -91,7 +165,7 @@ class _BodyState extends State<Body> {
             child: Text("Описание",
                 style: TextStyle(
                     fontFamily: "assets/fonts/tenor_sans.ttf",
-                    fontSize: 14,
+                    fontSize: 30,
                     color: kPrimaryColor)),
           ),
           Container(
@@ -110,19 +184,19 @@ class _BodyState extends State<Body> {
                     color: kPrimaryColor.withOpacity(0.7),
                   )
                 ]),
-            child: Expanded(
-              child: TextField(
-                onChanged: (value) {
-                  description = value;
-                  setState(() {});
-                },
-                cursorColor: kPrimaryColor,
-                decoration: InputDecoration(
-                  hintText: "Введите описание",
-                  hintStyle: TextStyle(color: kPrimaryColor.withOpacity(0.5)),
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                ),
+            child: TextField(
+              onChanged: (value) {
+                description = value;
+                is_added = false;
+                error = false;
+                setState(() {});
+              },
+              cursorColor: kPrimaryColor,
+              decoration: InputDecoration(
+                hintText: "Введите описание",
+                hintStyle: TextStyle(color: kPrimaryColor.withOpacity(0.5)),
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
               ),
             ),
           ),
@@ -131,7 +205,7 @@ class _BodyState extends State<Body> {
             child: Text("Изображение",
                 style: TextStyle(
                     fontFamily: "assets/fonts/tenor_sans.ttf",
-                    fontSize: 14,
+                    fontSize: 30,
                     color: kPrimaryColor)),
           ),
           Container(
@@ -150,23 +224,23 @@ class _BodyState extends State<Body> {
                     color: kPrimaryColor.withOpacity(0.7),
                   )
                 ]),
-            child: Expanded(
-              child: TextField(
-                onChanged: (value) {
-                  url_photo = value;
-                  setState(() {});
-                },
-                cursorColor: kPrimaryColor,
-                decoration: InputDecoration(
-                  hintText: "Вставьте ссылку на изображение",
-                  hintStyle: TextStyle(color: kPrimaryColor.withOpacity(0.5)),
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                ),
+            child: TextField(
+              onChanged: (value) {
+                url_photo = value;
+                is_added = false;
+                error = false;
+                setState(() {});
+              },
+              cursorColor: kPrimaryColor,
+              decoration: InputDecoration(
+                hintText: "Вставьте ссылку на изображение",
+                hintStyle: TextStyle(color: kPrimaryColor.withOpacity(0.5)),
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
               ),
             ),
           ),
-          const Padding(
+          /*const Padding(
             padding: EdgeInsets.all(kDefaultPadding),
             child: Text("Видео",
                 style: TextStyle(
@@ -205,25 +279,30 @@ class _BodyState extends State<Body> {
                 ),
               ),
             ),
-          ),
+          ),*/
           const Padding(
             padding: EdgeInsets.all(kDefaultPadding),
             child: Text("Продукты",
                 style: TextStyle(
                     fontFamily: "assets/fonts/tenor_sans.ttf",
-                    fontSize: 14,
+                    fontSize: 30,
                     color: kPrimaryColor)),
           ),
           ElevatedButton(
             onPressed: () async {
               List<Product> data = await getAllProduct();
-              String? result = await showSearch<String>(
+              dynamic result = await showSearch<dynamic>(
                 context: context,
                 delegate: CustomDelegate(data),
               );
-              if (result != null && !products.contains(result)) {
-                products.add(result);
-                setState(() {});
+              if (result != null) {
+                String chooseProduct = result as String;
+                if (!products.contains(chooseProduct)) {
+                  products.add(chooseProduct);
+                  is_added = false;
+                  error = false;
+                  setState(() {});
+                }
               }
             },
             child: const Text(
@@ -257,7 +336,7 @@ class _BodyState extends State<Body> {
                       ),
                       child: Row(
                         children: [
-                          Text(products[i],
+                          Text('  ' + products[i],
                               style: const TextStyle(
                                   fontFamily: "assets/fonts/tenor_sans.ttf",
                                   fontSize: 15,
@@ -265,6 +344,8 @@ class _BodyState extends State<Body> {
                           IconButton(
                               onPressed: () async {
                                 products.removeAt(i);
+                                is_added = false;
+                                error = false;
                                 setState(() {});
                               },
                               icon: const Icon(Icons.clear, size: 20)),
@@ -279,40 +360,7 @@ class _BodyState extends State<Body> {
               },
             ),
           ),
-          ElevatedButton(
-              onPressed: () async {
-
-                String url = "http://localhost:8080/recipes/add";
-                var jsonMap = {
-                  "name": name,
-                  "description": description,
-                  "video": url_video,
-                  "photo": url_photo,
-                  "date" : "2022-05-14"
-                };
-                String jsonStr = jsonEncode(jsonMap);
-                print(jsonStr);
-                http.Response response = await http.post(Uri.parse(url), body: jsonStr, headers: {"Content-Type" : "application/json"} );
-                String id_recipe = jsonDecode(response.body)["id"].toString();
-                print(id_recipe);
-                for (int i = 0; i < products.length; ++i) {
-                  String url_id_product = "http://localhost:8080/products/id?productName=" + products[i];
-                  response = await http.get(Uri.parse(url_id_product));
-                  print(response.body);
-                  String id_product = response.body;
-                  url = "http://localhost:8080/recipes/" + id_recipe + "/products/" + id_product;
-                  response = await http.put(Uri.parse(url));
-                  print(response.statusCode);
-                }
-              },
-              child: const Text(
-                "Добавить рецепт",
-                style: TextStyle(
-                    fontFamily: "assets/fonts/tenor_sans.ttf", fontSize: 30),
-              ),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.deepPurple[300],
-              )),
+          check(),
         ]),
       )
     ]));
