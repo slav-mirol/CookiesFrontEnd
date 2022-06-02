@@ -88,7 +88,7 @@ class _BodyState extends State<Body> {
     }
     if (products.isNotEmpty) {
       url += "product=";
-      for (int i = 0; i < products.length - 2; ++i) {
+      for (int i = 0; i < products.length - 1; ++i) {
         url += products[i] + ',';
       }
       url += products[products.length - 1];
